@@ -8,4 +8,12 @@
 
 3. `uv run uvicorn jemdzem.backend:app --reload`
 
-4. `cd examples && ./ocr.sh`
+## Examples
+
+```bash
+./examples/ocr.sh
+```
+
+```bash
+uv run examples/detect.py
+```
