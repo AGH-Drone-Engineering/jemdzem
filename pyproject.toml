@@ -7,6 +7,7 @@ requires-python = ">=3.10"
 dependencies = [
     "fastapi>=0.115.12",
     "google-genai>=1.16.1",
+    "matplotlib>=3.10.3",
     "numpy>=2.2.6",
     "opencv-python>=4.11.0.86",
     "pydantic>=2.11.4",
