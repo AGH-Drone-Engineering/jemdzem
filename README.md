@@ -15,5 +15,9 @@
 ```
 
 ```bash
-uv run examples/detect.py
+uv run examples/single_detect.py
+```
+
+```bash
+uv run examples/multi_detect.py
 ```
