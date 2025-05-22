@@ -12,7 +12,7 @@ Instructions:
 
 Target object: {{TARGET_OBJECT}}
 Object description: {{OBJECT_DESCRIPTION}}
-
+{{EXTRA_INSTRUCTIONS}}
 You are an object detection expert. Analyze the image and locate instances of the object. For each object, include:
 1. box_2d: The bounding box in [ymin, xmin, ymax, xmax] format.
 
@@ -42,8 +42,10 @@ Example Output:
 
 
 class GeminiSingleDetector:
-    def detect(self, image: np.ndarray, label: str, description: str, model_name: str) -> list[dict]:
+    def detect(self, image: np.ndarray, label: str, description: str, model_name: str, ref_image: np.ndarray | None = None) -> list[dict]:
         prompt = PROMPT.replace("{{TARGET_OBJECT}}", label).replace("{{OBJECT_DESCRIPTION}}", description)
+        if ref_image is not None:
+            prompt = prompt.replace("{{EXTRA_INSTRUCTIONS}}", "A reference image of the object is provided as the first image. You need to find this object in the second image.\n")
         contents = [
             types.Content(
                 role="user",
@@ -53,6 +55,8 @@ class GeminiSingleDetector:
                 ],
             ),
         ]
+        if ref_image is not None:
+            contents[0].parts.insert(0, image_to_part(ref_image))
         resp = client.models.generate_content(
             model=model_name,
             contents=contents,

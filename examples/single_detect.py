@@ -10,15 +10,20 @@ if __name__ == "__main__":
     _, img_encoded = cv2.imencode('.png', image)
     img_bytes = img_encoded.tobytes()
 
+    ref_image = cv2.imread(os.path.join(os.path.dirname(__file__), "keys.png"))
+
+    _, ref_img_encoded = cv2.imencode('.png', ref_image)
+    ref_img_bytes = ref_img_encoded.tobytes()
+
     data = {
-        "label": "car",
-        "description": "a car",
+        "label": "keys",
+        "description": "car keys",
     }
 
     response = requests.post(
-        "http://localhost:8000/single-detect",
+        "http://localhost:8000/single-detect?model_name=gemini-2.5-flash-preview-04-17",
         headers={"X-API-Key": "tym_razem_to_musi_poleciec"},
-        files={"file": ("image.png", img_bytes, "image/png")},
+        files={"file": ("image.png", img_bytes, "image/png"), "ref_file": ("ref_image.png", ref_img_bytes, "image/png")},
         data=data,
     )
     detections = response.json()

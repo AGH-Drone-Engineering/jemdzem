@@ -54,12 +54,17 @@ class SingleDetectRequest(BaseModel):
 @app.post("/single-detect")
 async def api_single_detect(
     file: UploadFile = File(...),
+    ref_file: UploadFile | None = File(None),
     label: str = Form(...),
     description: str = Form(...),
     model_name: str = "gemini-2.0-flash",
 ):
     image = await image_from_upload_file(file)
-    detections = gemini_single_detector.detect(image, label, description, model_name)
+    if ref_file is not None:
+        ref_image = await image_from_upload_file(ref_file)
+    else:
+        ref_image = None
+    detections = gemini_single_detector.detect(image, label, description, model_name, ref_image)
     return JSONResponse(content=detections)
 
 
