@@ -42,10 +42,7 @@ Example Output:
 
 
 class GeminiSingleDetector:
-    def __init__(self, model_name: str):
-        self.model_name = model_name
-
-    def detect(self, image: np.ndarray, label: str, description: str) -> list[dict]:
+    def detect(self, image: np.ndarray, label: str, description: str, model_name: str) -> list[dict]:
         prompt = PROMPT.replace("{{TARGET_OBJECT}}", label).replace("{{OBJECT_DESCRIPTION}}", description)
         contents = [
             types.Content(
@@ -57,7 +54,7 @@ class GeminiSingleDetector:
             ),
         ]
         resp = client.models.generate_content(
-            model=self.model_name,
+            model=model_name,
             contents=contents,
             config=types.GenerateContentConfig(
                 response_mime_type="text/plain",

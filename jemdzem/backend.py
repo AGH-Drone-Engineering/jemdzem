@@ -25,7 +25,7 @@ async def api_ocr(file: UploadFile = File(...)):
     })
 
 
-gemini_multi_detector = GeminiMultiDetector(model_name="gemini-2.5-flash-preview-04-17")
+gemini_multi_detector = GeminiMultiDetector()
 
 class MultiDetectRequest(BaseModel):
     labels: list[str]
@@ -35,16 +35,17 @@ class MultiDetectRequest(BaseModel):
 async def api_multi_detect(
     file: UploadFile = File(...),
     labels: str = Form(...),
-    descriptions: str = Form(...)
+    descriptions: str = Form(...),
+    model_name: str = "gemini-2.0-flash",
 ):
     image = await image_from_upload_file(file)
     labels_list = json.loads(labels)
     descriptions_list = json.loads(descriptions)
-    detections = gemini_multi_detector.detect(image, labels_list, descriptions_list)
+    detections = gemini_multi_detector.detect(image, labels_list, descriptions_list, model_name)
     return JSONResponse(content=detections)
 
 
-gemini_single_detector = GeminiSingleDetector(model_name="gemini-2.0-flash")
+gemini_single_detector = GeminiSingleDetector()
 
 class SingleDetectRequest(BaseModel):
     label: str
@@ -54,10 +55,11 @@ class SingleDetectRequest(BaseModel):
 async def api_single_detect(
     file: UploadFile = File(...),
     label: str = Form(...),
-    description: str = Form(...)
+    description: str = Form(...),
+    model_name: str = "gemini-2.0-flash",
 ):
     image = await image_from_upload_file(file)
-    detections = gemini_single_detector.detect(image, label, description)
+    detections = gemini_single_detector.detect(image, label, description, model_name)
     return JSONResponse(content=detections)
 
 
