@@ -3,6 +3,8 @@ from fastapi.responses import JSONResponse
 import uvicorn
 from pydantic import BaseModel
 import json
+import os
+import numpy as np
 
 from .auth import get_api_key
 from .api_utils import image_from_upload_file
@@ -54,18 +56,43 @@ class SingleDetectRequest(BaseModel):
 @app.post("/single-detect")
 async def api_single_detect(
     file: UploadFile = File(...),
-    ref_file: UploadFile | None = File(None),
-    label: str = Form(...),
-    description: str = Form(...),
+    ref_files: list[UploadFile] | None = File(None),
+    labels: str = Form(...),
+    descriptions: str = Form(...),
     model_name: str = "gemini-2.0-flash",
 ):
+    """Detect multiple classes using the single detector internally.
+
+    The API mirrors ``/multi-detect`` but executes a separate single detector
+    call for every provided label/description pair. Optional reference images can
+    be supplied for individual classes by sending multiple ``ref_file`` form
+    fields. The reference image is matched to the label by comparing the file
+    name (without extension) with the class label.
+    """
+
     image = await image_from_upload_file(file)
-    if ref_file is not None:
-        ref_image = await image_from_upload_file(ref_file)
-    else:
-        ref_image = None
-    detections = gemini_single_detector.detect(image, label, description, model_name, ref_image)
-    return JSONResponse(content=detections)
+    labels_list = json.loads(labels)
+    descriptions_list = json.loads(descriptions)
+
+    # Load reference images into a mapping {label: image}
+    ref_map: dict[str, np.ndarray] = {}
+    if ref_files:
+        for rfile in ref_files:
+            label_name, _ = os.path.splitext(rfile.filename)
+            ref_map[label_name] = await image_from_upload_file(rfile)
+
+    results = []
+    for label, description in zip(labels_list, descriptions_list):
+        ref_image = ref_map.get(label)
+        detections = gemini_single_detector.detect(
+            image, label, description, model_name, ref_image
+        )
+        for det in detections:
+            det_with_label = det.copy()
+            det_with_label["label"] = label
+            results.append(det_with_label)
+
+    return JSONResponse(content=results)
 
 
 if __name__ == "__main__":
