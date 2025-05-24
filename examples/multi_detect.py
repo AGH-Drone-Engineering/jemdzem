@@ -1,3 +1,5 @@
+"""Example script calling the ``/multi-detect`` API and visualising results."""
+
 import requests
 import matplotlib.pyplot as plt
 import cv2

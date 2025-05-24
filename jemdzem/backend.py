@@ -1,7 +1,8 @@
+"""REST API exposing OCR and object detection endpoints."""
+
 from fastapi import FastAPI, Depends, File, UploadFile, Form
 from fastapi.responses import JSONResponse
 import uvicorn
-from pydantic import BaseModel
 import json
 import os
 import numpy as np
@@ -20,6 +21,7 @@ gemini_ocr = GeminiOCR()
 
 @app.post("/ocr")
 async def api_ocr(file: UploadFile = File(...)):
+    """Return text extracted from the uploaded image."""
     image = await image_from_upload_file(file)
     text = gemini_ocr.ocr(image)
     return JSONResponse(content={
@@ -29,10 +31,6 @@ async def api_ocr(file: UploadFile = File(...)):
 
 gemini_multi_detector = GeminiMultiDetector()
 
-class MultiDetectRequest(BaseModel):
-    labels: list[str]
-    descriptions: list[str]
-
 @app.post("/multi-detect")
 async def api_multi_detect(
     file: UploadFile = File(...),
@@ -40,6 +38,7 @@ async def api_multi_detect(
     descriptions: str = Form(...),
     model_name: str = "gemini-2.0-flash",
 ):
+    """Detect multiple classes in ``file`` using ``GeminiMultiDetector``."""
     image = await image_from_upload_file(file)
     labels_list = json.loads(labels)
     descriptions_list = json.loads(descriptions)
@@ -48,10 +47,6 @@ async def api_multi_detect(
 
 
 gemini_single_detector = GeminiSingleDetector()
-
-class SingleDetectRequest(BaseModel):
-    label: str
-    description: str
 
 @app.post("/single-detect")
 async def api_single_detect(
@@ -79,6 +74,7 @@ async def api_single_detect(
     if ref_files:
         for rfile in ref_files:
             label_name, _ = os.path.splitext(rfile.filename)
+            # map each reference file to the label matching its filename
             ref_map[label_name] = await image_from_upload_file(rfile)
 
     results = []

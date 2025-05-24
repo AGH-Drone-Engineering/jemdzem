@@ -1,9 +1,11 @@
+"""Multi-class object detection using Gemini models."""
+
 import json
 import numpy as np
 from google.genai import types
 
 from .client import client
-from .utils import image_to_part
+from .utils import image_to_part, box_to_relative
 
 
 PROMPT = \
@@ -46,31 +48,38 @@ Example Output:
 
 
 class GeminiMultiDetector:
-    def detect(self, image: np.ndarray, labels: list[str], descriptions: list[str], model_name: str) -> list[dict]:
+    """Wraps the Gemini API to detect multiple classes in a single call."""
+
+    def detect(
+        self,
+        image: np.ndarray,
+        labels: list[str],
+        descriptions: list[str],
+        model_name: str,
+    ) -> list[dict]:
+        """Return detections for ``image`` for each ``label``/``description`` pair."""
+
         prompt = PROMPT.replace(
             "{{OBJECTS}}",
-            "\n".join([f"{label}: {description}" for label, description in zip(labels, descriptions)]))
+            "\n".join(
+                f"{label}: {description}" for label, description in zip(labels, descriptions)
+            ),
+        )
+
         contents = [
             types.Content(
                 role="user",
-                parts=[
-                    image_to_part(image),
-                    types.Part.from_text(text=prompt),
-                ],
+                parts=[image_to_part(image), types.Part.from_text(text=prompt)],
             ),
         ]
+
         resp = client.models.generate_content(
             model=model_name,
             contents=contents,
-            config=types.GenerateContentConfig(
-                response_mime_type="text/plain",
-            ),
+            config=types.GenerateContentConfig(response_mime_type="text/plain"),
         )
+
         boxes = json.loads(resp.text.removeprefix("```json").removesuffix("```"))
-        return [{
-            "label": box["label"],
-            "x": box["box_2d"][1] / 1000,
-            "y": box["box_2d"][0] / 1000,
-            "width": (box["box_2d"][3] - box["box_2d"][1]) / 1000,
-            "height": (box["box_2d"][2] - box["box_2d"][0]) / 1000,
-        } for box in boxes]
+        return [
+            {"label": box["label"], **box_to_relative(box["box_2d"])} for box in boxes
+        ]

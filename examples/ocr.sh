@@ -1,4 +1,5 @@
 #! /usr/bin/env bash
+# Simple helper script for testing the ``/ocr`` endpoint.
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 IMAGE_PATH="${SCRIPT_DIR}/hello_world.png"
