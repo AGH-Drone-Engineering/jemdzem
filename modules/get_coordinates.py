@@ -114,11 +114,19 @@ def calculate_new_coordinates(
         detected object in degrees.
     """
     geod = Geodesic.WGS84
-    result_lat = geod.Direct(lat, lng, 0, delta_y_meters)
-    new_lat = result_lat["lat2"]
-    lat_rad = math.radians(lat)
-    result_lon = geod.Direct(lat, lng, 90, delta_x_meters * math.cos(lat_rad))
-    new_lng = result_lon["lon2"]
+
+    # Compute the total offset distance in the ground plane
+    distance = math.hypot(delta_x_meters, delta_y_meters)
+
+    if distance == 0.0:
+        return lat, lng
+
+    # Bearing from North (0°) clockwise to East (90°)
+    azimuth_deg = math.degrees(math.atan2(delta_x_meters, delta_y_meters))
+
+    res = geod.Direct(lat, lng, azimuth_deg, distance)
+    new_lat = res["lat2"]
+    new_lng = res["lon2"]
     return new_lat, new_lng
 
 
