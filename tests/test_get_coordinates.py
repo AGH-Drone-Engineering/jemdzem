@@ -2,6 +2,7 @@ import math
 from geographiclib.geodesic import Geodesic
 import numpy as np
 import pytest
+from typing import Tuple
 
 from modules import get_coordinates
 
@@ -21,7 +22,7 @@ def test_sign_handling() -> None:
     assert math.isclose(result, -15.5, rel_tol=0, abs_tol=1e-6)
 
 
-def make_camera():
+def make_camera() -> Tuple[np.ndarray, np.ndarray, Tuple[float, float]]:
     # Camera parameters roughly matching the ones used in module examples
     img_width = 5472.0
     img_height = 3648.0
