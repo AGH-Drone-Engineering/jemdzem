@@ -5,8 +5,7 @@ exposes a small FastAPI backend with three endpoints:
 
 * `/ocr` &ndash; extract text from an uploaded image
 * `/multi-detect` &ndash; detect multiple object classes at once
-* `/single-detect` &ndash; detect one class per request, optionally using
-  reference images
+* `/single-detect` &ndash; detect multiple object classes with individual Gemini calls, optionally using reference images
 
 The examples located in `examples/` demonstrate how to call these endpoints.
 
