@@ -51,6 +51,14 @@ uv run examples/single_detect.py  # single detector with optional reference imag
 uv run examples/multi_detect.py   # multi-class detector
 ```
 
+## Testing
+
+Run the tests with
+
+```bash
+uv run python -m pytest
+```
+
 ## Repository layout
 
 * `jemdzem/backend.py` &ndash; FastAPI application exposing the API
