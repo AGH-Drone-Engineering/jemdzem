@@ -27,6 +27,16 @@ pip install uv
 Project dependencies are installed automatically the first time you run
 any script with `uv run`.
 
+### Linting
+
+Code style is enforced with [Ruff](https://docs.astral.sh/ruff/). Run
+
+```bash
+uv run ruff check . --fix
+```
+
+before committing changes to automatically format and lint the project.
+
 ## Running the server
 
 1. Export your Gemini API key
