@@ -1,5 +1,7 @@
 import math
 from geographiclib.geodesic import Geodesic
+import cv2
+import numpy as np
 from typing import Tuple
 
 def degrees_to_d_m_s(degrees:float) -> Tuple[int, float]:
@@ -32,70 +34,61 @@ def d_m_s_to_degrees(d:int, m:int, s:float) -> float:
     return degrees
 
 def pixels_to_meters(
-    pixels: int,  # distance in pixels that will be converted to meters
-    altitude: float,  # drone altitude
-    img_width: int,  # image width in pixels
-    focal_length: float,  # focal length (camera dependency)
-    sensor_width: float,  # sensor width (camera dependency)
-) -> float:  # meters received from pixels
-    """
-    Function estimates the meter distance based on pixel distance
-    and parameters that affects scaling.
+    pixels: int,
+    altitude: float,
+    focal_length_px: float,
+) -> float:
+    """Convert a distance in pixels to meters using camera intrinsics.
 
     Args:
-        pixels - distance in pixels that needs to be converted to meters
-        altitude - altitude of drone in meters
-        img_width - image width of a frame in pixels
-        focal_length - camera parameter provided by manufacturer
-        sensor_width - camera parameter provided by manufacturer
-    Returns:
-        meters - converted pixels to the meters unit
-    """
-    meters_per_pixel = (altitude * sensor_width) / (focal_length * img_width)
+        pixels: Distance in image pixels.
+        altitude: Altitude of the camera above the ground in meters.
+        focal_length_px: Focal length in *pixels* (fx or fy from the camera matrix).
 
-    meters = pixels * meters_per_pixel
-    return meters
+    Returns:
+        Distance expressed in meters.
+    """
+    meters_per_pixel = altitude / focal_length_px
+    return pixels * meters_per_pixel
 
 
 def translate(
     x: float,
     y: float,
     altitude: float,
-    angle=0.0,
-    img_height=3648.0,
-    img_width=5472.0,
-    focal_length=23.0,
-    sensor_width=25.4,
-):
-    """
-    Function calculates the offset in meters from the image center for a detected object,
-    based on its pixel position, drone altitude, camera parameters, and optional image rotation.
-
+    camera_matrix: np.ndarray,
+    dist_coeffs: np.ndarray,
+    angle: float = 0.0,
+) -> Tuple[float, float]:
+    """Calculate the metric offset from the image centre using camera intrinsics.
 
     Args:
-        x - x coordinate (in meters or pixels, depending on context) of the detected object
-        y - y coordinate (in meters or pixels, depending on context) of the detected object
-        altitude - altitude of the drone in meters
-        angle - rotation angle of the image (radians), default 0.0
-        img_height - image height in pixels, default 3648.0
-        img_width - image width in pixels, default 5472.0
-        focal_length - camera focal length, default 23.0
-        sensor_width - camera sensor width, default 25.4
+        x: X pixel coordinate of the detected object.
+        y: Y pixel coordinate of the detected object.
+        altitude: Altitude of the camera in meters.
+        camera_matrix: 3x3 intrinsic camera matrix ``[[fx,0,cx],[0,fy,cy],[0,0,1]]``.
+        dist_coeffs: Distortion coefficients for the lens.
+        angle: Optional rotation of the image around the optical axis (radians).
 
     Returns:
-        delta_x_meters: Offset in meters from the image center along the X axis.
-        delta_y_meters: Offset in meters from the image center along the Y axis.
+        ``delta_x_meters`` and ``delta_y_meters`` describing the offset from the
+        image centre in metres.
     """
-    x_n = x * math.cos(angle) - y * math.sin(angle)
-    y_n = x * math.sin(angle) + y * math.cos(angle)
-    x_center = pixels_to_meters(
-        img_width / 2.0, altitude, img_width, focal_length, sensor_width
-    )
-    y_center = pixels_to_meters(
-        img_height / 2.0, altitude, img_width, focal_length, sensor_width
-    )
-    delta_x_meters = x_n - x_center
-    delta_y_meters = -(y_n - y_center)
+
+    pts = np.array([[[x, y]]], dtype=np.float32)
+    norm = cv2.undistortPoints(pts, camera_matrix, dist_coeffs)
+    xn, yn = norm[0, 0]
+
+    # Coordinates on the ground plane assuming the camera looks straight down.
+    X = xn * altitude
+    Y = yn * altitude
+
+    # Apply optional rotation around the Z axis.
+    Xr = X * math.cos(angle) - Y * math.sin(angle)
+    Yr = X * math.sin(angle) + Y * math.cos(angle)
+
+    delta_x_meters = Xr
+    delta_y_meters = -Yr
 
     return delta_x_meters, delta_y_meters
 
@@ -143,28 +136,22 @@ def unit_test_get_coordinates():
     angle = 0.0
     img_height = 3648.0
     img_width = 5472.0
-    focal_length = 23.0
-    sensor_width = 25.4
 
-    # Test pixels_to_meters for center (should be 0 offset)
-    meters_x = pixels_to_meters(
-        x_pixel, altitude, img_width, focal_length, sensor_width
-    )
-    meters_y = pixels_to_meters(
-        y_pixel, altitude, img_width, focal_length, sensor_width
-    )
-    print(f"meters_x: {meters_x}, meters_y: {meters_y}")
+    # Approximate camera intrinsics for the test
+    fx = fy = 4955.0
+    cx = img_width / 2.0
+    cy = img_height / 2.0
+    camera_matrix = np.array([[fx, 0, cx], [0, fy, cy], [0, 0, 1]], dtype=np.float32)
+    dist_coeffs = np.zeros(5)
 
     # Test translate for center (should be close to 0,0)
     delta_x, delta_y = translate(
-        meters_x,
-        meters_y,
+        x_pixel,
+        y_pixel,
         altitude,
+        camera_matrix,
+        dist_coeffs,
         angle,
-        img_height,
-        img_width,
-        focal_length,
-        sensor_width,
     )
     print(f"delta_x: {delta_x}, delta_y: {delta_y}")
     assert abs(delta_x) < 1e-6, "delta_x should be near zero for image center"
@@ -179,22 +166,14 @@ def unit_test_get_coordinates():
     # Test for a point away from center
     x_pixel2 = 3000
     y_pixel2 = 2000
-    meters_x2 = pixels_to_meters(
-        x_pixel2, altitude, img_width, focal_length, sensor_width
-    )
-    meters_y2 = pixels_to_meters(
-        y_pixel2, altitude, img_width, focal_length, sensor_width
-    )
 
     delta_x2, delta_y2 = translate(
-        meters_x2,
-        meters_y2,
+        x_pixel2,
+        y_pixel2,
         altitude,
+        camera_matrix,
+        dist_coeffs,
         angle,
-        img_height,
-        img_width,
-        focal_length,
-        sensor_width,
     )
     new_lat2, new_lng2 = calculate_new_coordinates(lat, lng, delta_x2, delta_y2)
     print(f"Offset lat/lng: {new_lat2}, {new_lng2}")
@@ -203,14 +182,8 @@ def unit_test_get_coordinates():
 
 
 if __name__ == "__main__":
-    # Define params for Yuneec camera
+    # Example usage of the utilities
     (IMG_HEIGHT, IMG_WIDTH) = (3648.0, 5472.0)
-    SENSOR_WIDTH = 25.4
-    FOCAL_LENGTH = 23.0
 
-    # Zero step: call d_m_s_to_degrees() if the geo position is in degrees/minutes/seconds and not in
-    # degrees only (Yuneec is storing that informations as deg/min/sec in the metadata of it's pictures).
-    # Fist call pixels_to_meters() to rescale position of detected object to the meter unit value
-    # Then translate() it to the delta distance from the middle
-    # On the end use calculate_new_coordinates() to receive new lateral and longitudinal positions
+    # Run the simple unit test when executed directly
     unit_test_get_coordinates()
