@@ -116,3 +116,22 @@ def test_distance_and_bearing() -> None:
     expected_az = (math.degrees(math.atan2(dx, dy)) + 360) % 360
     result_az = (inv["azi1"] + 360) % 360
     assert math.isclose(result_az, expected_az, rel_tol=0, abs_tol=1e-6)
+
+
+@pytest.mark.parametrize(
+    "pixels, expected",
+    [
+        (0, 0.0),
+        (1, 2.0),
+        (5, 10.0),
+        (10, 20.0),
+        (50, 100.0),
+    ],
+)
+def test_pixels_to_meters_basic(pixels: int, expected: float) -> None:
+    assert math.isclose(
+        get_coordinates.pixels_to_meters(pixels, altitude=100.0, focal_length_px=50.0),
+        expected,
+        rel_tol=0,
+        abs_tol=1e-6,
+    )
