@@ -14,25 +14,32 @@ def degrees_to_d_m_s(degrees: float) -> Tuple[int, int, float]:
         A tuple ``(d, m, s)`` where ``d`` and ``m`` are integers representing
         degrees and minutes and ``s`` is a float representing seconds.
     """
-    d = int(degrees)
-    minutes_decimal = (degrees - d) * 60
+
+    sign = -1 if degrees < 0 else 1
+    abs_deg = abs(degrees)
+
+    d = int(abs_deg)
+    minutes_decimal = (abs_deg - d) * 60
     m = int(minutes_decimal)
     s = (minutes_decimal - m) * 60
-    return d, m, s
 
-def d_m_s_to_degrees(d:int, m:int, s:float) -> float:
+    return sign * d, m, s
+
+def d_m_s_to_degrees(d: int, m: int, s: float) -> float:
     """Converts degrees, minutes, and seconds to decimal degrees.
 
     Args:
-        d - degrees
-        m - minutes
-        s - seconds
+        d - degrees (sign of the coordinate)
+        m - minutes (non-negative)
+        s - seconds (non-negative)
 
     Returns:
         degrees - floating value of geo postion in one var
     """
-    degrees = d + (m / 60) + (s / 3600)
-    return degrees
+
+    sign = -1 if d < 0 else 1
+    deg_abs = abs(d) + (m / 60) + (s / 3600)
+    return sign * deg_abs
 
 def pixels_to_meters(
     pixels: int,

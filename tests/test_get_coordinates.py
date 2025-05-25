@@ -13,6 +13,14 @@ def test_round_trip_degrees_to_dms_and_back(deg: float) -> None:
     assert math.isclose(result, deg, rel_tol=0, abs_tol=1e-6)
 
 
+def test_sign_handling() -> None:
+    d, m, s = get_coordinates.degrees_to_d_m_s(-15.5)
+    assert (d, m, s) == (-15, 30, 0)
+
+    result = get_coordinates.d_m_s_to_degrees(d, m, s)
+    assert math.isclose(result, -15.5, rel_tol=0, abs_tol=1e-6)
+
+
 def make_camera():
     # Camera parameters roughly matching the ones used in module examples
     img_width = 5472.0
