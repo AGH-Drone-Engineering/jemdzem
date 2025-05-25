@@ -5,14 +5,14 @@ import numpy as np
 from typing import Tuple
 
 def degrees_to_d_m_s(degrees: float) -> Tuple[int, int, float]:
-    """Converts decimal degrees to degrees, minutes and seconds.
+    """Convert decimal degrees to a ``(degrees, minutes, seconds)`` tuple.
 
     Args:
-        degrees - floating value of geo postion in one var
+        degrees: Geographic coordinate in decimal degrees.
 
     Returns:
         A tuple ``(d, m, s)`` where ``d`` and ``m`` are integers representing
-        degrees and minutes and ``s`` is a float representing seconds.
+        degrees and minutes and ``s`` is the seconds component.
     """
 
     sign = -1 if degrees < 0 else 1
@@ -26,15 +26,15 @@ def degrees_to_d_m_s(degrees: float) -> Tuple[int, int, float]:
     return sign * d, m, s
 
 def d_m_s_to_degrees(d: int, m: int, s: float) -> float:
-    """Converts degrees, minutes, and seconds to decimal degrees.
+    """Convert a ``(degrees, minutes, seconds)`` tuple to decimal degrees.
 
     Args:
-        d - degrees (sign of the coordinate)
-        m - minutes (non-negative)
-        s - seconds (non-negative)
+        d: Degrees component (the sign denotes hemisphere).
+        m: Minutes component (non‐negative).
+        s: Seconds component (non‐negative).
 
     Returns:
-        degrees - floating value of geo postion in one var
+        Geographic coordinate expressed in decimal degrees.
     """
 
     sign = -1 if d < 0 else 1
@@ -107,18 +107,20 @@ def calculate_new_coordinates(
     delta_x_meters: float,  # meters distance from middle on x axis
     delta_y_meters: float,  # meters distance from middle on y axis
 ) -> Tuple[float, float]:  # tuple containing the object's latitude and longitude
-    """
-    Function uses geographiclib library to estimate geo position of
-    detected object.
+    """Compute the object's latitude and longitude from metric offsets.
+
+    The function uses ``geographiclib`` to translate the planar offsets
+    from the drone position into WGS84 coordinates.
 
     Args:
-        lat - lateral position of drone in geo notation (degrees)
-        lng - longitudinal position of drone in geo notation (degrees)
-        delta_x_meters - distance from the middle on x axis with meters
-        delta_y_meters - distance from the middle on y axis with meters
+        lat: Current latitude of the drone in decimal degrees.
+        lng: Current longitude of the drone in decimal degrees.
+        delta_x_meters: Offset from image centre along the x-axis in meters.
+        delta_y_meters: Offset from image centre along the y-axis in meters.
+
     Returns:
-        A tuple ``(new_lat, new_lng)`` with the latitude and longitude of the
-        detected object in degrees.
+        A tuple ``(new_lat, new_lng)`` with the coordinates of the detected
+        object in decimal degrees.
     """
     geod = Geodesic.WGS84
 
