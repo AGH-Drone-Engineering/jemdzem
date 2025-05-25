@@ -196,6 +196,26 @@ def test_calculate_new_coordinates_near_zero_distance() -> None:
 
 
 @pytest.mark.parametrize(
+    "dx, dy, expected_az",
+    [
+        (10.0, 10.0, 45.0),
+        (-10.0, 10.0, 315.0),
+        (-10.0, -10.0, 225.0),
+        (10.0, -10.0, 135.0),
+    ],
+)
+def test_diagonal_directions(dx: float, dy: float, expected_az: float) -> None:
+    new_lat, new_lng = get_coordinates.calculate_new_coordinates(LAT, LNG, dx, dy)
+
+    inv = Geodesic.WGS84.Inverse(LAT, LNG, new_lat, new_lng)
+    expected_dist = math.hypot(dx, dy)
+    assert math.isclose(inv["s12"], expected_dist, rel_tol=0, abs_tol=1e-6)
+
+    result_az = (inv["azi1"] + 360) % 360
+    assert math.isclose(result_az, expected_az, rel_tol=0, abs_tol=1e-6)
+
+
+@pytest.mark.parametrize(
     "pixels, expected",
     [
         (0, 0.0),
