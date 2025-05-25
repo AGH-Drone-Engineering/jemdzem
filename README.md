@@ -1,6 +1,6 @@
 # Jem Dżem
 
-Simple OCR and object detection service powered by Google Gemini. The project
+Image analysis service powered by Google Gemini. The project
 exposes a small FastAPI backend with three endpoints:
 
 * `/ocr` &ndash; extract text from an uploaded image
