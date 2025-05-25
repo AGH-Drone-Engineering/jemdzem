@@ -185,7 +185,6 @@ def unit_test_get_coordinates():
 
 if __name__ == "__main__":
     # Example usage of the utilities
-    (IMG_HEIGHT, IMG_WIDTH) = (3648.0, 5472.0)
 
     # Run the simple unit test when executed directly
     unit_test_get_coordinates()
