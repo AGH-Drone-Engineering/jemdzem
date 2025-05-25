@@ -145,7 +145,7 @@ def calculate_new_coordinates(
     # Compute the total offset distance in the ground plane
     distance = math.hypot(delta_x_meters, delta_y_meters)
 
-    if distance == 0.0:
+    if math.isclose(distance, 0.0, abs_tol=1e-9):
         return lat, lng
 
     # Bearing from North (0°) clockwise to East (90°)

@@ -189,6 +189,12 @@ def test_distance_and_bearing() -> None:
     assert math.isclose(result_az, expected_az, rel_tol=0, abs_tol=1e-6)
 
 
+def test_calculate_new_coordinates_near_zero_distance() -> None:
+    new_lat, new_lng = get_coordinates.calculate_new_coordinates(LAT, LNG, 1e-10, 1e-10)
+    assert new_lat == LAT
+    assert new_lng == LNG
+
+
 @pytest.mark.parametrize(
     "pixels, expected",
     [
