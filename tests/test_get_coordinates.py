@@ -23,7 +23,12 @@ def test_sign_handling() -> None:
 
 
 def make_camera() -> Tuple[np.ndarray, np.ndarray, Tuple[float, float]]:
-    # Camera parameters roughly matching the ones used in module examples
+    """Return camera intrinsics used by the translate tests.
+
+    The returned ``(camera_matrix, dist_coeffs, center)`` tuple approximates
+    the parameters from the example modules. ``center`` is the principal point
+    referenced by ``translate`` and ``calculate_new_coordinates``.
+    """
     img_width = 5472.0
     img_height = 3648.0
     fx = fy = 4955.0
