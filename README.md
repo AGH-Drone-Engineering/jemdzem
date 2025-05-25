@@ -57,3 +57,13 @@ uv run examples/multi_detect.py   # multi-class detector
 * `jemdzem/ai/` &ndash; wrappers around Gemini models for OCR and detection
 * `jemdzem/api_utils.py` &ndash; helper utilities for image handling
 * `jemdzem/auth.py` &ndash; simple API key authentication
+
+## Contributing
+
+Code style is enforced with [Ruff](https://docs.astral.sh/ruff/). Run
+
+```bash
+uv run ruff check . --fix
+```
+
+before committing changes to automatically format and lint the project.
