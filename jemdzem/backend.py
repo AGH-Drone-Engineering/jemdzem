@@ -12,6 +12,7 @@ from .api_utils import image_from_upload_file
 from .ai.ocr import GeminiOCR
 from .ai.multi_detector import GeminiMultiDetector
 from .ai.single_detector import GeminiSingleDetector
+from .ai.qa import GeminiQA
 
 
 app = FastAPI(title="Zawsze lubiłem dżem", dependencies=[Depends(get_api_key)])
@@ -49,6 +50,8 @@ async def api_multi_detect(
 
 
 gemini_single_detector = GeminiSingleDetector()
+
+gemini_qa = GeminiQA()
 
 
 @app.post("/single-detect")
@@ -92,6 +95,19 @@ async def api_single_detect(
             results.append(det_with_label)
 
     return JSONResponse(content=results)
+
+
+@app.post("/qa")
+async def api_qa(
+    file: UploadFile = File(...),
+    question: str = Form(...),
+    model_name: str = "gemini-2.0-flash",
+):
+    """Answer ``question`` about ``file`` using ``GeminiQA``."""
+
+    image = await image_from_upload_file(file)
+    answer = gemini_qa.answer(image, question, model_name)
+    return JSONResponse(content={"answer": answer})
 
 
 if __name__ == "__main__":

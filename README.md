@@ -1,11 +1,12 @@
 # Jem Dżem
 
 Image analysis service powered by Google Gemini. The project
-exposes a small FastAPI backend with three endpoints:
+exposes a small FastAPI backend with four endpoints:
 
 * `/ocr` &ndash; extract text from an uploaded image
 * `/multi-detect` &ndash; detect multiple object classes at once
 * `/single-detect` &ndash; detect multiple object classes with individual Gemini calls, optionally using reference images
+* `/qa` &ndash; ask a question about an uploaded image
 
 The examples located in `examples/` demonstrate how to call these endpoints.
 
@@ -49,6 +50,7 @@ Run the provided examples while the server is running:
 ./examples/ocr.sh           # OCR demo
 uv run examples/single_detect.py  # single detector with optional reference image
 uv run examples/multi_detect.py   # multi-class detector
+uv run examples/qa.py             # question answering
 ```
 
 ## Testing
