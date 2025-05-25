@@ -8,8 +8,7 @@ from .client import client
 from .utils import image_to_part, box_to_relative
 
 
-PROMPT = \
-"""
+PROMPT = """
 Instructions:
 
 You are given a list of objects with their descriptions (label: description).
@@ -62,7 +61,8 @@ class GeminiMultiDetector:
         prompt = PROMPT.replace(
             "{{OBJECTS}}",
             "\n".join(
-                f"{label}: {description}" for label, description in zip(labels, descriptions)
+                f"{label}: {description}"
+                for label, description in zip(labels, descriptions)
             ),
         )
 

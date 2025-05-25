@@ -51,6 +51,14 @@ uv run examples/single_detect.py  # single detector with optional reference imag
 uv run examples/multi_detect.py   # multi-class detector
 ```
 
+## Testing
+
+Run the tests with
+
+```bash
+uv run python -m pytest
+```
+
 ## Repository layout
 
 * `jemdzem/backend.py` &ndash; FastAPI application exposing the API
@@ -63,7 +71,8 @@ uv run examples/multi_detect.py   # multi-class detector
 Code style is enforced with [Ruff](https://docs.astral.sh/ruff/). Run
 
 ```bash
-uv run ruff check . --fix
+uv run ruff check --fix .
+uv run ruff format .
 ```
 
 before committing changes to automatically format and lint the project.

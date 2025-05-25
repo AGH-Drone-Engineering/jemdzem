@@ -8,8 +8,7 @@ from .client import client
 from .utils import image_to_part
 
 
-PROMPT = \
-"""
+PROMPT = """
 Instructions:
 
 You are an optical character recognition expert. You are given an image of a text. Your task is to extract the text from the image.

@@ -10,12 +10,12 @@ import json
 if __name__ == "__main__":
     image = cv2.imread(os.path.join(os.path.dirname(__file__), "detect.jpeg"))
 
-    _, img_encoded = cv2.imencode('.png', image)
+    _, img_encoded = cv2.imencode(".png", image)
     img_bytes = img_encoded.tobytes()
 
     ref_image = cv2.imread(os.path.join(os.path.dirname(__file__), "keys.png"))
 
-    _, ref_img_encoded = cv2.imencode('.png', ref_image)
+    _, ref_img_encoded = cv2.imencode(".png", ref_image)
     ref_img_bytes = ref_img_encoded.tobytes()
 
     data = {
@@ -43,7 +43,9 @@ if __name__ == "__main__":
             "keys": (255, 0, 255),
         }[detection["label"]]
         cv2.rectangle(image, (x, y), (x + width, y + height), color, 8)
-        cv2.putText(image, detection["label"], (x, y), cv2.FONT_HERSHEY_SIMPLEX, 2, color, 8)
+        cv2.putText(
+            image, detection["label"], (x, y), cv2.FONT_HERSHEY_SIMPLEX, 2, color, 8
+        )
     plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
     plt.axis("off")
     plt.show()

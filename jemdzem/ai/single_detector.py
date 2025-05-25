@@ -8,8 +8,7 @@ from .client import client
 from .utils import image_to_part, box_to_relative
 
 
-PROMPT = \
-"""
+PROMPT = """
 Instructions:
 
 Target object: {{TARGET_OBJECT}}
