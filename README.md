@@ -1,23 +1,60 @@
 # Jem Dżem
 
-## Getting started
+Simple OCR and object detection service powered by Google Gemini. The project
+exposes a small FastAPI backend with three endpoints:
 
-1. Get Gemini API key from https://aistudio.google.com/
+* `/ocr` &ndash; extract text from an uploaded image
+* `/multi-detect` &ndash; detect multiple object classes at once
+* `/single-detect` &ndash; detect one class per request, optionally using
+  reference images
 
-2. `export GOOGLE_API_KEY=<your-api-key>`
+The examples located in `examples/` demonstrate how to call these endpoints.
 
-3. `uv run uvicorn jemdzem.backend:app --reload`
+## Requirements
+
+* Python 3.12
+* A Gemini API key from [Google&nbsp;AI Studio](https://aistudio.google.com/)
+* [`uv`](https://github.com/astral-sh/uv) for dependency management (install
+  with `pip install uv`)
+
+## Installation
+
+Install [`uv`](https://github.com/astral-sh/uv) if it is not already available:
+
+```bash
+pip install uv
+```
+
+Project dependencies are installed automatically the first time you run
+any script with `uv run`.
+
+## Running the server
+
+1. Export your Gemini API key
+   ```bash
+   export GOOGLE_API_KEY=<your-api-key>
+   ```
+2. Start the FastAPI server
+   ```bash
+   uv run uvicorn jemdzem.backend:app --reload
+   ```
+
+The API expects an `X-API-Key` header. For local development the default key is
+`tym_razem_to_musi_poleciec`, which is used by the example scripts.
 
 ## Examples
 
-```bash
-./examples/ocr.sh
-```
+Run the provided examples while the server is running:
 
 ```bash
-uv run examples/single_detect.py
+./examples/ocr.sh           # OCR demo
+uv run examples/single_detect.py  # single detector with optional reference image
+uv run examples/multi_detect.py   # multi-class detector
 ```
 
-```bash
-uv run examples/multi_detect.py
-```
+## Repository layout
+
+* `jemdzem/backend.py` &ndash; FastAPI application exposing the API
+* `jemdzem/ai/` &ndash; wrappers around Gemini models for OCR and detection
+* `jemdzem/api_utils.py` &ndash; helper utilities for image handling
+* `jemdzem/auth.py` &ndash; simple API key authentication
