@@ -9,17 +9,33 @@ from modules import get_coordinates
 
 @pytest.mark.parametrize("deg", [0, -15.5, 37.7749, 179.9999])
 def test_round_trip_degrees_to_dms_and_back(deg: float) -> None:
-    d, m, s = get_coordinates.degrees_to_d_m_s(deg)
-    result = get_coordinates.d_m_s_to_degrees(d, m, s)
+    sign, d, m, s = get_coordinates.degrees_to_d_m_s(deg)
+    result = get_coordinates.d_m_s_to_degrees(sign, d, m, s)
     assert math.isclose(result, deg, rel_tol=0, abs_tol=1e-6)
 
 
 def test_sign_handling() -> None:
-    d, m, s = get_coordinates.degrees_to_d_m_s(-15.5)
-    assert (d, m, s) == (-15, 30, 0)
+    sign, d, m, s = get_coordinates.degrees_to_d_m_s(-15.5)
+    assert (sign, d, m, s) == (-1, 15, 30, 0)
 
-    result = get_coordinates.d_m_s_to_degrees(d, m, s)
+    result = get_coordinates.d_m_s_to_degrees(sign, d, m, s)
     assert math.isclose(result, -15.5, rel_tol=0, abs_tol=1e-6)
+
+
+@pytest.mark.parametrize(
+    "deg, expected",
+    [
+        (0.5, (1, 0, 30, 0)),
+        (-0.5, (-1, 0, 30, 0)),
+        (0.25, (1, 0, 15, 0)),
+        (-0.75, (-1, 0, 45, 0)),
+    ],
+)
+def test_under_one_degree(deg: float, expected: Tuple[int, int, int, int]) -> None:
+    result = get_coordinates.degrees_to_d_m_s(deg)
+    assert result == expected
+    back = get_coordinates.d_m_s_to_degrees(*result)
+    assert math.isclose(back, deg, rel_tol=0, abs_tol=1e-6)
 
 
 def make_camera() -> Tuple[np.ndarray, np.ndarray, Tuple[float, float]]:

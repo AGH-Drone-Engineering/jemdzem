@@ -4,15 +4,16 @@ import cv2
 import numpy as np
 from typing import Tuple
 
-def degrees_to_d_m_s(degrees: float) -> Tuple[int, int, float]:
-    """Convert decimal degrees to a ``(degrees, minutes, seconds)`` tuple.
+def degrees_to_d_m_s(degrees: float) -> Tuple[int, int, int, float]:
+    """Convert decimal degrees to a ``(sign, degrees, minutes, seconds)`` tuple.
 
     Args:
         degrees: Geographic coordinate in decimal degrees.
 
     Returns:
-        A tuple ``(d, m, s)`` where ``d`` and ``m`` are integers representing
-        degrees and minutes and ``s`` is the seconds component.
+        A tuple ``(sign, d, m, s)`` where ``sign`` is either ``1`` or ``-1`` and
+        ``d`` and ``m`` are the absolute degree and minute components. ``s`` is
+        the seconds component. ``d``, ``m`` and ``s`` are always non-negative.
     """
 
     sign = -1 if degrees < 0 else 1
@@ -23,13 +24,14 @@ def degrees_to_d_m_s(degrees: float) -> Tuple[int, int, float]:
     m = int(minutes_decimal)
     s = (minutes_decimal - m) * 60
 
-    return sign * d, m, s
+    return sign, d, m, s
 
-def d_m_s_to_degrees(d: int, m: int, s: float) -> float:
-    """Convert a ``(degrees, minutes, seconds)`` tuple to decimal degrees.
+def d_m_s_to_degrees(sign: int, d: int, m: int, s: float) -> float:
+    """Convert a ``(sign, degrees, minutes, seconds)`` tuple to decimal degrees.
 
     Args:
-        d: Degrees component (the sign denotes hemisphere).
+        sign: ``1`` or ``-1`` specifying the hemisphere.
+        d: Degrees component (non‐negative).
         m: Minutes component (non‐negative).
         s: Seconds component (non‐negative).
 
@@ -37,8 +39,7 @@ def d_m_s_to_degrees(d: int, m: int, s: float) -> float:
         Geographic coordinate expressed in decimal degrees.
     """
 
-    sign = -1 if d < 0 else 1
-    deg_abs = abs(d) + (m / 60) + (s / 3600)
+    deg_abs = d + (m / 60) + (s / 3600)
     return sign * deg_abs
 
 def pixels_to_meters(
