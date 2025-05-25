@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 from typing import Tuple
 
+
 def degrees_to_d_m_s(degrees: float) -> Tuple[int, int, int, float]:
     """Convert decimal degrees to a ``(sign, degrees, minutes, seconds)`` tuple.
 
@@ -38,6 +39,7 @@ def degrees_to_d_m_s(degrees: float) -> Tuple[int, int, int, float]:
 
     return sign, d, m, s
 
+
 def d_m_s_to_degrees(sign: int, d: int, m: int, s: float) -> float:
     """Convert a ``(sign, degrees, minutes, seconds)`` tuple to decimal degrees.
 
@@ -53,6 +55,7 @@ def d_m_s_to_degrees(sign: int, d: int, m: int, s: float) -> float:
 
     deg_abs = d + (m / 60) + (s / 3600)
     return sign * deg_abs
+
 
 def pixels_to_meters(
     pixels: float,
@@ -152,5 +155,3 @@ def calculate_new_coordinates(
     new_lat = res["lat2"]
     new_lng = res["lon2"]
     return new_lat, new_lng
-
-

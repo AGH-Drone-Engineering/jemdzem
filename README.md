@@ -71,7 +71,8 @@ uv run python -m pytest
 Code style is enforced with [Ruff](https://docs.astral.sh/ruff/). Run
 
 ```bash
-uv run ruff check . --fix
+uv run ruff check --fix .
+uv run ruff format .
 ```
 
 before committing changes to automatically format and lint the project.

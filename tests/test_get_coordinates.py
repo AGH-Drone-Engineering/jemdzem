@@ -82,9 +82,13 @@ def test_translate_offset_not_zero() -> None:
     x_off = center[0] + 100
     y_off = center[1] + 50
 
-    dx, dy = get_coordinates.translate(x_off, y_off, altitude, camera_matrix, dist_coeffs)
+    dx, dy = get_coordinates.translate(
+        x_off, y_off, altitude, camera_matrix, dist_coeffs
+    )
 
-    assert not math.isclose(dx, 0.0, abs_tol=1e-6) or not math.isclose(dy, 0.0, abs_tol=1e-6)
+    assert not math.isclose(dx, 0.0, abs_tol=1e-6) or not math.isclose(
+        dy, 0.0, abs_tol=1e-6
+    )
 
 
 def test_translate_rotation() -> None:
@@ -123,7 +127,9 @@ def test_calculate_new_coordinates() -> None:
     x_off = center[0] + 100
     y_off = center[1] + 50
 
-    dx, dy = get_coordinates.translate(x_off, y_off, altitude, camera_matrix, dist_coeffs)
+    dx, dy = get_coordinates.translate(
+        x_off, y_off, altitude, camera_matrix, dist_coeffs
+    )
     off_lat, off_lng = get_coordinates.calculate_new_coordinates(lat, lng, dx, dy)
 
     assert not math.isclose(off_lat, lat, abs_tol=1e-6)
@@ -139,13 +145,14 @@ def test_calculate_new_coordinates() -> None:
 LAT = 50.0
 LNG = 19.0
 
+
 @pytest.mark.parametrize(
     "dx, dy, lat_rel, lng_rel",
     [
-        (0.0, 10.0, 1, 0),   # north -> lat increases
-        (0.0, -10.0, -1, 0), # south -> lat decreases
-        (10.0, 0.0, 0, 1),   # east -> lon increases
-        (-10.0, 0.0, 0, -1), # west -> lon decreases
+        (0.0, 10.0, 1, 0),  # north -> lat increases
+        (0.0, -10.0, -1, 0),  # south -> lat decreases
+        (10.0, 0.0, 0, 1),  # east -> lon increases
+        (-10.0, 0.0, 0, -1),  # west -> lon decreases
     ],
 )
 def test_cardinal_directions(dx: float, dy: float, lat_rel: int, lng_rel: int) -> None:

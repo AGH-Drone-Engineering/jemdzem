@@ -12,6 +12,8 @@
 
 ## After you finish work
 
-1. uv run ruff check .
+1. uv run ruff check --fix .
 
-2. uv run python -m pytest
+2. uv run ruff format .
+
+3. uv run python -m pytest
