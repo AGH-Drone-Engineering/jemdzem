@@ -99,7 +99,7 @@ def calculate_new_coordinates(
     lng: float,  # longitudinal position of drone
     delta_x_meters: float,  # meters distance from middle on x axis
     delta_y_meters: float,  # meters distance from middle on y axis
-) -> Tuple[float]:  # tuple of lateral and longitudinal positions of detected object
+) -> Tuple[float, float]:  # tuple containing the object's latitude and longitude
     """
     Function uses geographiclib library to estimate geo position of
     detected object.
@@ -110,7 +110,8 @@ def calculate_new_coordinates(
         delta_x_meters - distance from the middle on x axis with meters
         delta_y_meters - distance from the middle on y axis with meters
     Returns:
-        new_lat, new_lng - lateral and longitudinal position of detected object (degrees)
+        A tuple ``(new_lat, new_lng)`` with the latitude and longitude of the
+        detected object in degrees.
     """
     geod = Geodesic.WGS84
     result_lat = geod.Direct(lat, lng, 0, delta_y_meters)
