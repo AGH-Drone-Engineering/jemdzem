@@ -7,11 +7,19 @@ from typing import Tuple
 from modules import get_coordinates
 
 
-@pytest.mark.parametrize("deg", [0, -15.5, 37.7749, 179.9999])
+@pytest.mark.parametrize("deg", [0, -15.5, 37.7749, 179.9999, 179.999999])
 def test_round_trip_degrees_to_dms_and_back(deg: float) -> None:
     sign, d, m, s = get_coordinates.degrees_to_d_m_s(deg)
     result = get_coordinates.d_m_s_to_degrees(sign, d, m, s)
     assert math.isclose(result, deg, rel_tol=0, abs_tol=1e-6)
+
+
+def test_seconds_rounding_carry() -> None:
+    deg = 179.9999999999
+    sign, d, m, s = get_coordinates.degrees_to_d_m_s(deg)
+    assert (sign, d, m, s) == (1, 180, 0, 0.0)
+    back = get_coordinates.d_m_s_to_degrees(sign, d, m, s)
+    assert math.isclose(back, deg, rel_tol=0, abs_tol=1e-6)
 
 
 def test_sign_handling() -> None:

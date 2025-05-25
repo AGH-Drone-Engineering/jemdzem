@@ -24,6 +24,18 @@ def degrees_to_d_m_s(degrees: float) -> Tuple[int, int, int, float]:
     m = int(minutes_decimal)
     s = (minutes_decimal - m) * 60
 
+    # Round seconds to fixed precision to avoid floating point noise
+    s = round(s, 6)
+
+    # Handle carry-over from rounding
+    if s >= 60.0:
+        s = 0.0
+        m += 1
+
+    if m >= 60:
+        m = 0
+        d += 1
+
     return sign, d, m, s
 
 def d_m_s_to_degrees(sign: int, d: int, m: int, s: float) -> float:
