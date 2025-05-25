@@ -51,6 +51,18 @@ def test_translate_center_near_zero() -> None:
     assert abs(dy) < 1e-6
 
 
+def test_translate_offset_not_zero() -> None:
+    camera_matrix, dist_coeffs, center = make_camera()
+    altitude = 100.0
+
+    x_off = center[0] + 100
+    y_off = center[1] + 50
+
+    dx, dy = get_coordinates.translate(x_off, y_off, altitude, camera_matrix, dist_coeffs)
+
+    assert not math.isclose(dx, 0.0, abs_tol=1e-6) or not math.isclose(dy, 0.0, abs_tol=1e-6)
+
+
 def test_translate_rotation() -> None:
     camera_matrix, dist_coeffs, center = make_camera()
     altitude = 100.0
