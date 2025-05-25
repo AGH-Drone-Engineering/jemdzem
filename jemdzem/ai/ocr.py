@@ -1,3 +1,5 @@
+"""OCR wrapper around Gemini models."""
+
 import numpy as np
 import json
 from google.genai import types
@@ -23,24 +25,24 @@ Example response:
 
 
 class GeminiOCR:
-    def __init__(self):
+    """Simple OCR helper using a Gemini model."""
+
+    def __init__(self) -> None:
         self.model_name = "gemini-2.0-flash"
 
     def ocr(self, image: np.ndarray) -> str:
+        """Return recognized text from ``image``."""
+
         contents = [
             types.Content(
                 role="user",
-                parts=[
-                    image_to_part(image),
-                    types.Part.from_text(text=PROMPT),
-                ],
-            ),
+                parts=[image_to_part(image), types.Part.from_text(text=PROMPT)],
+            )
         ]
+
         resp = client.models.generate_content(
             model=self.model_name,
             contents=contents,
-            config=types.GenerateContentConfig(
-                response_mime_type="text/plain",
-            ),
+            config=types.GenerateContentConfig(response_mime_type="text/plain"),
         )
         return json.loads(resp.text.removeprefix("```json").removesuffix("```"))["text"]
