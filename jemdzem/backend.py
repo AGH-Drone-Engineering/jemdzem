@@ -101,7 +101,7 @@ async def api_single_detect(
 async def api_qa(
     file: UploadFile = File(...),
     question: str = Form(...),
-    model_name: str = "gemini-pro-vision",
+    model_name: str = "gemini-2.0-flash",
 ):
     """Answer ``question`` about ``file`` using ``GeminiQA``."""
 
