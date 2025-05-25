@@ -42,7 +42,7 @@ def d_m_s_to_degrees(d: int, m: int, s: float) -> float:
     return sign * deg_abs
 
 def pixels_to_meters(
-    pixels: int,
+    pixels: float,
     altitude: float,
     focal_length_px: float,
 ) -> float:
