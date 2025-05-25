@@ -96,6 +96,8 @@ def translate(
     Yr = X * math.sin(angle) + Y * math.cos(angle)
 
     delta_x_meters = Xr
+    # Image Y coordinates increase downward, so negate the value so that
+    # positive ``delta_y_meters`` corresponds to northward movement.
     delta_y_meters = -Yr
 
     return delta_x_meters, delta_y_meters
