@@ -45,6 +45,28 @@ def test_translate_center_near_zero() -> None:
     assert abs(dy) < 1e-6
 
 
+def test_translate_rotation() -> None:
+    camera_matrix, dist_coeffs, center = make_camera()
+    altitude = 100.0
+
+    x_off = center[0] + 100
+    y_off = center[1] + 50
+    angle = math.radians(30)
+
+    dx0, dy0 = get_coordinates.translate(
+        x_off, y_off, altitude, camera_matrix, dist_coeffs
+    )
+    dx_rot, dy_rot = get_coordinates.translate(
+        x_off, y_off, altitude, camera_matrix, dist_coeffs, angle
+    )
+
+    expected_dx = dx0 * math.cos(angle) + dy0 * math.sin(angle)
+    expected_dy = dy0 * math.cos(angle) - dx0 * math.sin(angle)
+
+    assert math.isclose(dx_rot, expected_dx, rel_tol=0, abs_tol=1e-6)
+    assert math.isclose(dy_rot, expected_dy, rel_tol=0, abs_tol=1e-6)
+
+
 def test_calculate_new_coordinates() -> None:
     camera_matrix, dist_coeffs, center = make_camera()
     altitude = 100.0
