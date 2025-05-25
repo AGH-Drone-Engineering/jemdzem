@@ -4,14 +4,15 @@ import cv2
 import numpy as np
 from typing import Tuple
 
-def degrees_to_d_m_s(degrees:float) -> Tuple[int, float]:
-    """Converts decimal degrees to degrees, minutes, and seconds.
+def degrees_to_d_m_s(degrees: float) -> Tuple[int, int, float]:
+    """Converts decimal degrees to degrees, minutes and seconds.
 
     Args:
         degrees - floating value of geo postion in one var
 
     Returns:
-        d, m, s - tuple of degrees, minutes and seconds that are (int, int, float)
+        A tuple ``(d, m, s)`` where ``d`` and ``m`` are integers representing
+        degrees and minutes and ``s`` is a float representing seconds.
     """
     d = int(degrees)
     minutes_decimal = (degrees - d) * 60
