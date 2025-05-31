@@ -6,10 +6,11 @@ import cv2
 import os
 import json
 import sys
+import raporting.push_point as push_point
 
 
 if __name__ == "__main__":
-    
+    push_point.clear_points()
     #objects = ["pipe","powerpole","barrell","palette","person","car"]
     objects = ["pipe"]
 
@@ -76,6 +77,7 @@ if __name__ == "__main__":
             "person": (255, 0, 0),
             "car": (0, 0, 255),
         }[detection["label"]]
+        push_point.push_detection_to_firebase(detection, (y,x), os.path.join(os.path.dirname(__file__), path))
         cv2.rectangle(image, (x, y), (x + width, y + height), color, 8)
         cv2.putText(
             image, detection["label"], (x, y), cv2.FONT_HERSHEY_SIMPLEX, 2, color, 8
@@ -83,3 +85,4 @@ if __name__ == "__main__":
     plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
     plt.axis("off")
     plt.savefig("plot.png") 
+    push_point.generate_points()
