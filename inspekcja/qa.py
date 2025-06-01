@@ -6,7 +6,9 @@ import os
 
 
 if __name__ == "__main__":
-    image = cv2.imread(os.path.join(os.path.dirname(__file__), "inspekcja/manekin_bez_kamzy.png"))
+    image = cv2.imread(
+        os.path.join(os.path.dirname(__file__), "inspekcja/manekin_bez_kamzy.png")
+    )
 
     _, img_encoded = cv2.imencode(".png", image)
     img_bytes = img_encoded.tobytes()

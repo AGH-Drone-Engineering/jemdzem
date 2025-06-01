@@ -13,4 +13,5 @@ fi
 
 echo "Environment OK. Starting..."
 cd /jemdzem
-uv run uvicorn jemdzem.backend:app --reload
+uv run uvicorn jemdzem.backend:app
+
