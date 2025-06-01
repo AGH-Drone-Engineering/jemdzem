@@ -5,19 +5,17 @@ import matplotlib.pyplot as plt
 import cv2
 import os
 import json
-import sys
 
 
 if __name__ == "__main__":
-    
-    #objects = ["pipe","powerpole","barrell","palette","person","car"]
+    # objects = ["pipe","powerpole","barrell","palette","person","car"]
     objects = ["pipe"]
 
-    '''filepaths = ["inspekcja/rura_urwana.JPG",
+    """filepaths = ["inspekcja/rura_urwana.JPG",
     "inspekcja/stojak.jpg",
     "inspekcja/beczka.png", 
     #"inspekcja/paleta.png"
-    ]'''
+    ]"""
 
     filepaths = ["rura_urwana.JPG"]
 
@@ -34,15 +32,15 @@ if __name__ == "__main__":
         _, ref_img_encoded = cv2.imencode(".png", ref_image)
         ref_img_bytes = ref_img_encoded.tobytes()
         name = "ref_file" + str(i)
-        pictures.append((name,(path,ref_img_bytes,"image/png")))
-        i+=1
+        pictures.append((name, (path, ref_img_bytes, "image/png")))
+        i += 1
 
-        '''["find all oragne pipes",
+        """["find all oragne pipes",
                                     "find black powerpoles and do not confuse them with shadows",
                                     "find all blue barrels",
                                     "find all wooden palettes",
                                     "find all people",
-                                    "find all cars"]'''
+                                    "find all cars"]"""
 
     data = {
         "labels": json.dumps(["pipe"]),
@@ -55,7 +53,7 @@ if __name__ == "__main__":
         files=[
             ("file", ("image.png", img_bytes, "image/png")),
             ("ref_file", ("rura_urwana.JPG", ref_img_bytes, "image/png")),
-            #("ref_file", ("stojak.jpeg", ref_img_bytes2, "image/png")),
+            # ("ref_file", ("stojak.jpeg", ref_img_bytes2, "image/png")),
         ],
         data=data,
     )
@@ -82,4 +80,4 @@ if __name__ == "__main__":
         )
     plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
     plt.axis("off")
-    plt.savefig("plot.png") 
+    plt.savefig("plot.png")

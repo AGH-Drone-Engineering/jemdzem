@@ -14,19 +14,26 @@ if __name__ == "__main__":
     _, img_encoded = cv2.imencode(".png", image)
     img_bytes = img_encoded.tobytes()
 
-    ref_image = cv2.imread(os.path.join(os.path.dirname(__file__), "inspekcja/rura_urwana.JPG"))
+    ref_image = cv2.imread(
+        os.path.join(os.path.dirname(__file__), "inspekcja/rura_urwana.JPG")
+    )
 
     _, ref_img_encoded = cv2.imencode(".png", ref_image)
     ref_img_bytes = ref_img_encoded.tobytes()
 
     ref_image2 = cv2.imread(os.path.join(os.path.dirname(__file__), "5.jpg"))
-    
+
     _, ref_img_encoded2 = cv2.imencode(".png", ref_image2)
     ref_img_bytes2 = ref_img_encoded2.tobytes()
 
     data = {
-        "labels": json.dumps(["pipe","powerpole","barrell","palet"]),
-        "descriptions": json.dumps(["find all oragne pipes","find black powerpoles and do not confuse them with shadows"]),
+        "labels": json.dumps(["pipe", "powerpole", "barrell", "palet"]),
+        "descriptions": json.dumps(
+            [
+                "find all oragne pipes",
+                "find black powerpoles and do not confuse them with shadows",
+            ]
+        ),
     }
 
     response = requests.post(
@@ -55,4 +62,4 @@ if __name__ == "__main__":
         )
     plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
     plt.axis("off")
-    plt.savefig("plot.png") 
+    plt.savefig("plot.png")
