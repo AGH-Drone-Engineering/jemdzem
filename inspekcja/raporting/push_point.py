@@ -4,6 +4,7 @@ import json
 import base64
 import argparse
 import firebase_admin
+import cv2
 from firebase_admin import credentials, db, firestore
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
@@ -44,9 +45,24 @@ def decrypt_config(encrypted_file):
     return json.loads(decrypt_file_to_bytes(encrypted_file, KEY_PASSWORD, SALT).decode("utf-8"))
 
 def image_to_base64(image_path):
-    """Konwertuje plik obrazu na base64."""
-    with open(image_path, 'rb') as f:
-        return base64.b64encode(f.read()).decode('utf-8')
+    """Konwertuje plik obrazu na base64 z kompresją do 64x64 px."""
+    # Wczytaj obraz
+    image = cv2.imread(image_path)
+    if image is None:
+        raise ValueError(f"Nie można wczytać obrazu: {image_path}")
+    
+    # Zmień rozmiar do 64x64 px (mały rozmiar dla Firebase)
+    resized_image = cv2.resize(image, (128, 128))
+    
+    # Kompresuj jako JPEG z umiarkowaną kompresją (jakość = 65)
+    encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 65]
+    success, encoded_img = cv2.imencode('.jpg', resized_image, encode_param)
+    
+    if not success:
+        raise ValueError("Nie można skompresować obrazu")
+    
+    # Konwertuj na base64
+    return base64.b64encode(encoded_img.tobytes()).decode('utf-8')
 
 def push_point_to_db(point_dict):
     """Dodaje punkt do bazy Firebase i ustawia generate na true."""
@@ -88,7 +104,13 @@ def push_detection_to_firebase(detection, gps_coords, image_path=None):
         'detection_time': datetime.datetime.now().isoformat()
     }
     if image_path:
-        point_dict['image'] = image_to_base64(image_path)
+        try:
+            image_b64 = image_to_base64(image_path)
+            print(f"Skompresowany obraz base64 length: {len(image_b64)}")
+            point_dict['image'] = image_b64
+        except Exception as e:
+            print(f"Błąd kompresji obrazu: {e}")
+            # Kontynuuj bez obrazu
     push_point_to_db(point_dict)
 
 if __name__ == '__main__':

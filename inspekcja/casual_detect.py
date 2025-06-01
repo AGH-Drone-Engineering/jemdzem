@@ -10,7 +10,12 @@ import raporting.push_point as push_point
 
 
 if __name__ == "__main__":
+    ### ZMIANY RAPORTOWANIE ###
     push_point.clear_points()
+    temp_folder = os.path.join(os.path.dirname(__file__), "temp_detections")
+    os.makedirs(temp_folder, exist_ok=True)
+    ### KONIEC ZMIAN ###
+
     #objects = ["pipe","powerpole","barrell","palette","person","car"]
     objects = ["pipe"]
 
@@ -69,6 +74,13 @@ if __name__ == "__main__":
         y = int(detection["y"] * image.shape[0])
         width = int(detection["width"] * image.shape[1])
         height = int(detection["height"] * image.shape[0])
+        
+        ### ZMIANY RAPORTOWANIE ###
+        cropped_image = image[y:y+height, x:x+width]
+        temp_path = os.path.join(temp_folder, f"detection_{detection['label']}_{x}_{y}.png")
+        cv2.imwrite(temp_path, cropped_image)
+        ### KONIEC ZMIAN ###
+
         color = {
             "pipe": (0, 255, 0),
             "powerpole": (255, 0, 255),
@@ -77,7 +89,11 @@ if __name__ == "__main__":
             "person": (255, 0, 0),
             "car": (0, 0, 255),
         }[detection["label"]]
-        push_point.push_detection_to_firebase(detection, (y,x), os.path.join(os.path.dirname(__file__), path))
+        
+        ### ZMIANY RAPORTOWANIE ###
+        push_point.push_detection_to_firebase(detection, (y,x), temp_path)
+        ### KONIEC ZMIAN ###
+        
         cv2.rectangle(image, (x, y), (x + width, y + height), color, 8)
         cv2.putText(
             image, detection["label"], (x, y), cv2.FONT_HERSHEY_SIMPLEX, 2, color, 8
