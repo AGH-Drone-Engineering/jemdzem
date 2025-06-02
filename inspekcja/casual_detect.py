@@ -9,19 +9,14 @@ import sys
 
 
 if __name__ == "__main__":
-    
-    #objects = ["pipe","powerpole","barrell","palette","person","car"]
-    objects = ["pipe"]
+    objects = ["pipe", "powerpole"]
 
-    '''filepaths = ["inspekcja/rura_urwana.JPG",
-    "inspekcja/stojak.jpg",
-    "inspekcja/beczka.png", 
-    #"inspekcja/paleta.png"
-    ]'''
+    filepaths = [
+        "inspekcja/rura_urwana.JPG",
+        "inspekcja/stojak.jpg",
+    ]
 
-    filepaths = ["rura_urwana.JPG"]
-
-    image = cv2.imread(os.path.join(os.path.dirname(__file__), "YUN_0069.JPG"))
+    image = cv2.imread(os.path.join(os.path.dirname(__file__), sys.argv[1]))
     _, img_encoded = cv2.imencode(".png", image)
     img_bytes = img_encoded.tobytes()
 
@@ -34,29 +29,23 @@ if __name__ == "__main__":
         _, ref_img_encoded = cv2.imencode(".png", ref_image)
         ref_img_bytes = ref_img_encoded.tobytes()
         name = "ref_file" + str(i)
-        pictures.append((name,(path,ref_img_bytes,"image/png")))
-        i+=1
+        pictures.append((name, (path, ref_img_bytes, "image/png")))
+        i += 1
 
-        '''["find all oragne pipes",
-                                    "find black powerpoles and do not confuse them with shadows",
-                                    "find all blue barrels",
-                                    "find all wooden palettes",
-                                    "find all people",
-                                    "find all cars"]'''
+    descriptions = [
+        "find all oragne pipes",
+        "find black powerpoles and do not confuse them with shadows",
+    ]
 
     data = {
-        "labels": json.dumps(["pipe"]),
-        "descriptions": json.dumps(["find oragne pipes"]),
+        "labels": json.dumps(objects),
+        "descriptions": json.dumps(descriptions),
     }
 
     response = requests.post(
         "http://localhost:8000/single-detect?model_name=gemini-2.5-flash-preview-04-17",
         headers={"X-API-Key": "tym_razem_to_musi_poleciec"},
-        files=[
-            ("file", ("image.png", img_bytes, "image/png")),
-            ("ref_file", ("rura_urwana.JPG", ref_img_bytes, "image/png")),
-            #("ref_file", ("stojak.jpeg", ref_img_bytes2, "image/png")),
-        ],
+        files=pictures,
         data=data,
     )
 
@@ -82,4 +71,4 @@ if __name__ == "__main__":
         )
     plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
     plt.axis("off")
-    plt.savefig("plot.png") 
+    plt.savefig("plot.png")
