@@ -101,7 +101,8 @@ def push_detection_to_firebase(detection, gps_coords, image_path=None):
     point_dict = {
         'type': firebase_type,
         'gps_coords': [gps_coords[0], gps_coords[1]],
-        'detection_time': datetime.datetime.now().isoformat()
+        'detection_time': datetime.datetime.now().isoformat(),
+        'description': detection.get('description', f'Wykryto obiekt typu {label}')
     }
     if image_path:
         try:

@@ -75,8 +75,21 @@ if __name__ == "__main__":
         width = int(detection["width"] * image.shape[1])
         height = int(detection["height"] * image.shape[0])
         
-        ### ZMIANY RAPORTOWANIE ###
+        # Dodaj opis na podstawie typu detekcji
+        description_map = {
+            "pipe": "Wykryto rurociąg na terenie zakładu",
+            "powerpole": "Wykryto słup energetyczny", 
+            "barrell": "Wykryto beczkę na terenie",
+            "palette": "Wykryto paletę",
+            "person": "Wykryto pracownika na terenie zakładu",
+            "car": "Wykryto pojazd na terenie"
+        }
+        detection["description"] = description_map.get(detection["label"], f"Wykryto obiekt typu {detection['label']}")
+        
+        # Wytnij fragment obrazu zawierający detekcję
         cropped_image = image[y:y+height, x:x+width]
+        
+        # Zapisz wycięty fragment do folderu tymczasowego
         temp_path = os.path.join(temp_folder, f"detection_{detection['label']}_{x}_{y}.png")
         cv2.imwrite(temp_path, cropped_image)
         ### KONIEC ZMIAN ###
