@@ -47,8 +47,8 @@ if __name__ == "__main__":
         pictures.append((name, (path, ref_img_bytes, "image/png")))
 
         data = {
-            "labels": json.dumps(objects),
-            "descriptions": json.dumps(descriptions),
+            "labels": json.dumps(objects[i]),
+            "descriptions": json.dumps(descriptions[i]),
         }
 
         response = requests.post(
@@ -81,7 +81,8 @@ if __name__ == "__main__":
             )
         #plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
         plt.axis("off")
-        plt.savefig("plot" + str(i) + ".png")
+        plt.savefig("plot"+ str(i) + ".png")
+        print("Completed detection of",objects[i])
 
 ############################## DETECT PEOPLE #########################################
     data = {
@@ -119,7 +120,7 @@ if __name__ == "__main__":
         )
     # plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
     plt.axis("off")
-    plt.savefig("plot" + str(i) + ".png")
+    plt.savefig("plot_people.png")
 
 ############################ OUTFIT CHECK #######################################
     response = requests.post(
