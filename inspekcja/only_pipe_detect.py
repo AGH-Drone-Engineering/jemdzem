@@ -19,7 +19,7 @@ if __name__ == "__main__":
 
     filepaths = ["rura_urwana.JPG"]
 
-    image = cv2.imread(os.path.join(os.path.dirname(__file__), "YUN_0069.JPG"))
+    image = cv2.imread(os.path.join(os.path.dirname(__file__), "YUN_0155.JPG"))
     _, img_encoded = cv2.imencode(".png", image)
     img_bytes = img_encoded.tobytes()
 

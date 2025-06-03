@@ -13,7 +13,7 @@ if __name__ == "__main__":
 
     filepaths = [
         "inspekcja/rura_urwana.JPG",
-        "inspekcja/stojak.jpg",
+        "inspekcja/beczka.png",
     ]
 
     image = cv2.imread(os.path.join(os.path.dirname(__file__), sys.argv[1]))
@@ -34,7 +34,7 @@ if __name__ == "__main__":
 
     descriptions = [
         "find all oragne pipes",
-        "find black powerpoles and do not confuse them with shadows",
+        "find all blue barrells",
     ]
 
     data = {
