@@ -273,6 +273,59 @@ if __name__ == "__main__":
 
     cv2.imwrite(os.path.join(output_folder, "plot_people.png"), image)
 
+##################DETECT CAR#################################################################
+
+   pictures = [("file", ("image.png", img_bytes, "image/png"))]
+
+    data = {
+        "labels": json.dumps(["car"]),
+        "descriptions": json.dumps(["find all cars"]),
+    }
+
+    response = requests.post(
+        "http://localhost:8000/single-detect?model_name=gemini-2.5-flash-preview-04-17",
+        headers={"X-API-Key": "tym_razem_to_musi_poleciec"},
+        files=pictures,
+        data=data,
+    )
+
+    person_detections = []
+    if response.ok:
+        detections = response.json()
+        for detection in detections:
+            x = int(detection["x"] * image.shape[1])
+            y = int(detection["y"] * image.shape[0])
+            width = int(detection["width"] * image.shape[1])
+            height = int(detection["height"] * image.shape[0])
+            lat, lon = pixel_to_gps(x, y, image.shape[1], image.shape[0])
+
+
+            person_detections.append({
+                "label": detection["label"],
+                "bbox_px": [x, y, width, height],
+                "gps": {"lat": lat, "lon": lon}
+            })
+
+            color = {
+                "pipe": (0, 255, 0),
+                "barrell": (255, 255, 0),
+                "palette": (0, 255, 255),
+                "person": (255, 0, 0),
+                "car": (0, 0, 255),
+            }.get(detection["label"], (255, 255, 255))
+
+            cv2.rectangle(image, (x, y), (x + width, y + height), color, 8)
+            cv2.putText(image, detection["label"], (x, y), cv2.FONT_HERSHEY_SIMPLEX, 2, color, 8)
+            temp_path = os.path.join(temp_folder, f"detection_{detection['label']}_{x}_{y}.png")
+            cropped_image = image[y:y+height, x:x+width]
+            cv2.imwrite(temp_path, cropped_image)
+            push_point.push_detection_to_firebase(detection, (lat, lon), temp_path)
+
+        with open(os.path.join(output_folder, "car_detections.json"), "w") as f:
+            json.dump(person_detections, f, indent=2)
+
+    cv2.imwrite(os.path.join(output_folder, "plot_cars.png"), image)
+
     ### QA - outfit check ###
     outfit_response = requests.post(
         "http://localhost:8000/qa",
