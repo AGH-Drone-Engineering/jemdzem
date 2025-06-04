@@ -27,7 +27,7 @@ if __name__ == "__main__":
     if not ret:
         print("Failed to grab frame.")
         exit()
-
+    '''
 ######################## DETECT BARRELL/PIPE/PALETTE ###############
     objects = ["barrell","pipe","palette"]
     filepaths = ["inspekcja/beczka.png","inspekcja/rura_urwana.JPG","paleta.png"]
@@ -44,7 +44,7 @@ if __name__ == "__main__":
         _, ref_img_encoded = cv2.imencode(".png", ref_image)
         ref_img_bytes = ref_img_encoded.tobytes()
         name = "ref_file"
-        pictures.append((name, (path, ref_img_bytes, "image/png")))
+        pictures.append((name, (filepaths[i], ref_img_bytes, "image/png")))
 
         data = {
             "labels": json.dumps(objects[i]),
@@ -83,11 +83,15 @@ if __name__ == "__main__":
         plt.axis("off")
         plt.savefig("plot"+ str(i) + ".png")
         print("Completed detection of",objects[i])
+'''
 
-############################## DETECT PEOPLE #########################################
+    _, img_encoded = cv2.imencode(".png", image)
+    img_bytes = img_encoded.tobytes()
+    pictures = [("file", ("image.png", img_bytes, "image/png"))]
+    
     data = {
-        "labels": json.dumps(["people"]),
-        "descriptions": json.dumps(["find all manequins dressed as construction workers"]),
+        "labels": json.dumps(["person"]),
+        "descriptions": json.dumps(["find all people"]),
     }
 
     response = requests.post(
@@ -112,13 +116,13 @@ if __name__ == "__main__":
             "car": (0, 0, 255),
         }[detection["label"]]
         ### ZMIANY RAPORTOWANIE ###
-        push_point.push_detection_to_firebase(detection, (y, x), temp_path)
+        push_point.push_detection_to_firebase(detection, (y, x), "temp_path")
         ### KONIEC ZMIAN ###
         cv2.rectangle(image, (x, y), (x + width, y + height), color, 8)
         cv2.putText(
             image, detection["label"], (x, y), cv2.FONT_HERSHEY_SIMPLEX, 2, color, 8
         )
-    # plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+    plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
     plt.axis("off")
     plt.savefig("plot_people.png")
 
