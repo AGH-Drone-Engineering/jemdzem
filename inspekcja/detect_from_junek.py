@@ -14,7 +14,7 @@ if __name__ == "__main__":
     temp_folder = os.path.join(os.path.dirname(__file__), "temp_detections")
     os.makedirs(temp_folder, exist_ok=True)
     ### KONIEC ZMIAN ###
-    objects = ["barrell","pipe","person"]
+    objects = ["person"]
 
     stream_url = 'rtsp://192.168.241.1/live'
 
@@ -30,7 +30,7 @@ if __name__ == "__main__":
         print("Failed to grab frame.")
         exit()
 
-    filepaths = ["inspekcja/beczka.png","inspekcja/beczka.png"]
+    filepaths = ["inspekcja/czerwona_kamza.png"]
 
     #image = cv2.imread(os.path.join(os.path.dirname(__file__), sys.argv[1]))
     _, img_encoded = cv2.imencode(".png", image)
@@ -48,7 +48,7 @@ if __name__ == "__main__":
         pictures.append((name, (path, ref_img_bytes, "image/png")))
         i += 1
 
-    descriptions = ["find all blue barrels","find all orange pipes","find all people"]
+    descriptions = ["find all people"]
 
     data = {
         "labels": json.dumps(objects),
@@ -78,7 +78,7 @@ if __name__ == "__main__":
             "car": (0, 0, 255),
         }[detection["label"]]
 	### ZMIANY RAPORTOWANIE ###
-        push_point.push_detection_to_firebase(detection, (y,x), temp_path)
+        push_point.push_detection_to_firebase(detection, (y,x), temp_folder)
         ### KONIEC ZMIAN ###
         cv2.rectangle(image, (x, y), (x + width, y + height), color, 8)
         cv2.putText(
@@ -97,4 +97,4 @@ if __name__ == "__main__":
         },
     )
     print(response.json())
- push_point.generate_points()
+    push_point.generate_points()
