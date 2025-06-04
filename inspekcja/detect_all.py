@@ -42,17 +42,18 @@ if __name__ == "__main__":
 
     print("Connected to drone stream")
     
-    ### ArUco Detection ###
-    detect_and_draw_aruco(image, ARUCO_DICTS, pixel_to_gps, push_point,  output_folder, temp_folder)
-
+   
 ##################### DETECT BARRELL/PIPE/PALETTE ###############
     objects = ["barrell"]
 
-    descriptions = ["find all blue barrels with black lids in sun"]
+    descriptions = ["find all blue barrels with black lids"]
 
     #image = cv2.imread(os.path.join(os.path.dirname(__file__), sys.argv[1]))
     _, img_encoded = cv2.imencode(".png", image)
     img_bytes = img_encoded.tobytes()
+    ### ArUco Detection ###
+    detect_and_draw_aruco(image, ARUCO_DICTS, pixel_to_gps, push_point,  output_folder, temp_folder)
+
 
 
     ref_image = cv2.imread(os.path.join(os.path.dirname(__file__), "inspekcja/beczka.png"))
@@ -148,7 +149,7 @@ if __name__ == "__main__":
         temp_path = os.path.join(temp_folder, f"detection_{detection['label']}_{x}_{y}.png")
         cropped_image = image[y:y+height, x:x+width]
         cv2.imwrite(temp_path, cropped_image)
-        push_point.push_detection_to_firebase(detection, (y,x), temp_path)
+        #push_point.push_detection_to_firebase(detection, (y,x), temp_path)
         ### KONIEC ZMIAN ###
         cv2.rectangle(image, (x, y), (x + width, y + height), color, 8)
         cv2.putText(
@@ -204,7 +205,7 @@ if __name__ == "__main__":
         temp_path = os.path.join(temp_folder, f"detection_{detection['label']}_{x}_{y}.png")
         cropped_image = image[y:y+height, x:x+width]
         cv2.imwrite(temp_path, cropped_image)
-        push_point.push_detection_to_firebase(detection, (y,x), temp_path)
+        #push_point.push_detection_to_firebase(detection, (y,x), temp_path)
         ### KONIEC ZMIAN ###
         cv2.rectangle(image, (x, y), (x + width, y + height), color, 8)
         cv2.putText(
@@ -225,7 +226,7 @@ if __name__ == "__main__":
 
     data = {
         "labels": json.dumps(["person"]),
-        "descriptions": json.dumps(["find all people wearing yellow or red construction helmets"]),
+        "descriptions": json.dumps(["find all people and manequins"]),
     }
 
     response = requests.post(
@@ -265,7 +266,7 @@ if __name__ == "__main__":
             temp_path = os.path.join(temp_folder, f"detection_{detection['label']}_{x}_{y}.png")
             cropped_image = image[y:y+height, x:x+width]
             cv2.imwrite(temp_path, cropped_image)
-            push_point.push_detection_to_firebase(detection, (y,x), temp_path)
+            push_point.push_detection_to_firebase(detection, (lat, lon), temp_path)
 
         with open(os.path.join(output_folder, "person_detections.json"), "w") as f:
             json.dump(person_detections, f, indent=2)
@@ -281,8 +282,10 @@ if __name__ == "__main__":
             "question": "How many people or manequins are there? How many of them are weraing yellow or red helmets? How many of themare weraing yellow or red reflective vests?"
         },
     )
+    jjson=outfit_response.json()
+    push_point.answer(jjson["answer"])
     with open(os.path.join(output_folder, "qa_outfit.json"), "w") as f:
-        json.dump(outfit_response.json(), f, indent=2)
+        json.dump(jjson, f, indent=2)
 
     ### QA - graffiti check ###
     graffiti_response = requests.post(

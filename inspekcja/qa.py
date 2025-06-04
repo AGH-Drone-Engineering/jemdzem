@@ -6,17 +6,23 @@ import os
 
 
 if __name__ == "__main__":
-    image = cv2.imread(os.path.join(os.path.dirname(__file__), "YUN_0071.JPG"))
+    image = cv2.imread(os.path.join(os.path.dirname(__file__), "YUN_0195.JPG"))
 
     _, img_encoded = cv2.imencode(".png", image)
     img_bytes = img_encoded.tobytes()
+    
+    image2 = cv2.imread(os.path.join(os.path.dirname(__file__), "YUN_0155b.jpg"))
+
+    _, img_encoded2 = cv2.imencode(".png", image2)
+    img_bytes2 = img_encoded2.tobytes()
 
     response = requests.post(
         "http://localhost:8000/qa",
         headers={"X-API-Key": "tym_razem_to_musi_poleciec"},
-        files={"file": ("image.png", img_bytes, "image/png")},
+        files={"file": ("image.png", img_bytes, "image/png"),
+                "second_file": ("image2.png", img_bytes2, "image2/png")},
         data={
-            "question": "How many manequins are there? How many of them are weraing yellow helmets and yellow or red reflective vests? Give me coordinates where they are on picture in form of list"
+            "question": "What are the differences between these two pictures?"
         },
     )
     print(response.json())

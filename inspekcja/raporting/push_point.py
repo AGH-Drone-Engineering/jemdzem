@@ -114,6 +114,12 @@ def push_detection_to_firebase(detection, gps_coords, image_path=None):
             # Kontynuuj bez obrazu
     push_point_to_db(point_dict)
 
+def answer(tekst):
+    ref = db.reference('/')
+    # Pobierz aktualne punkty
+    data = ref.get()
+    ref.update({'answer': tekst})
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Dodaj punkt do bazy Firebase.')
     parser.add_argument('--type', required=True, help='Typ punktu (np. worker, infrastructure, emergency, aruco)')
