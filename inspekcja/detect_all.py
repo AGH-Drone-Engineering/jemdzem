@@ -116,7 +116,9 @@ if __name__ == "__main__":
             "car": (0, 0, 255),
         }[detection["label"]]
         ### ZMIANY RAPORTOWANIE ###
+        
         push_point.push_detection_to_firebase(detection, (y, x), "temp_path")
+        # BACKUP # push_point.push_detection_to_firebase(detection, (y, x), "temp_path")
         ### KONIEC ZMIAN ###
         cv2.rectangle(image, (x, y), (x + width, y + height), color, 8)
         cv2.putText(
